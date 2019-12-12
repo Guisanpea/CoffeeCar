@@ -14,14 +14,6 @@ import java.util.List;
 
 @RepositoryRestResource(collectionResourceRel = "announces", path = "announces")
 public interface AnnounceRepository extends CrudRepository<Announce, Long> {
-
-    List<Announce> findAnnouncesByArrival(@Param("arrival")String arrival);
-    List<Announce> findAnnouncesByArrivalAndArrivalDate(@Param("arrival") String arrival, @Param("arrival") String arrivalDate);
-    List<Announce> findAnnouncesByArrivalDate(@Param("arrivalDate") String arrivalDate);
-    List<Announce> findAnnouncesByDriverEmail(@Param("email") String driverEmail);
-    List<Announce> findAnnouncesByDriverEmailNot(@Param("email") String driverEmail);
-    @Query("select a from Announce a left join a.passengers u where u.email = ?1")
-    List<Announce> findByPassengersEmails(String email);
     @Query("SELECT DISTINCT a from Announce a JOIN a.driver d " +
           "WHERE d.email <> ?1 and ?1 NOT IN (SELECT p.email from a.passengers p)")
     List<Announce> findAvailableAnnounces(String email);
