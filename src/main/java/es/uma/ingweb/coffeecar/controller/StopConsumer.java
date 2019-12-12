@@ -42,11 +42,11 @@ public class StopConsumer {
     }
 
     @GetMapping(value = "/search/getLines")
-    public List<Float> getLines(@RequestParam(name = "codParada") float codParada){
+    public List<StopHierarchy.StopInfoResponse.StopData> getLines(@RequestParam(name = "codParada") float codParada){
         List<StopHierarchy.StopInfoResponse.StopData> stops = getStops();
         return stops.stream()
                 .filter(stop -> stop.getCodParada()==codParada)
-                .map(StopHierarchy.StopInfoResponse.StopData::getCodLinea).collect(Collectors.toList());
+                .collect(Collectors.toList());
 
     }
 }

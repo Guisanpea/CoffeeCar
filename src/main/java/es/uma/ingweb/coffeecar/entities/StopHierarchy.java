@@ -27,7 +27,7 @@ public class StopHierarchy {                             //result->records->info
         public static class StopData {
             private int _id;
             private int codParada;
-            private float codLinea;
+            private double codLinea;
             private float lat;
             private float lon;
         }
