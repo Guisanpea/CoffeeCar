@@ -21,25 +21,20 @@ import java.util.stream.Collectors;
 public class StopConsumer {
 
     private final RestTemplate restTemplate;
+    private final String PARADAS_URL = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=d7eb3174-dcfb-4917-9876-c0e21dd810e3";
 
     public StopConsumer(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    @GetMapping(value = "")
-    public List<StopHierarchy.StopInfoResponse.StopData> getBus() {
-        String uri = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=d7eb3174-dcfb-4917-9876-c0e21dd810e3";
-
-        return Objects.requireNonNull(restTemplate.getForObject(uri, StopHierarchy.class)).getResult().getStopsData();
+    private List<StopHierarchy.StopInfoResponse.StopData> getStops() {
+        return Objects.requireNonNull(restTemplate.getForObject(PARADAS_URL, StopHierarchy.class)).getResult().getStopsData();
     }
 
     @GetMapping(value = "/search/findNearby")
-    public List<StopHierarchy.StopInfoResponse.StopData> getBusByPosition(@RequestParam(name = "lat") float lat,
+    public List<StopHierarchy.StopInfoResponse.StopData> findNearby(@RequestParam(name = "lat") float lat,
                                                                           @RequestParam(name = "lon") float lon) {
-        String uri = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=d7eb3174-dcfb-4917-9876-c0e21dd810e3";
-        List<StopHierarchy.StopInfoResponse.StopData> stops = restTemplate.getForObject(uri, StopHierarchy.class)
-              .getResult()
-              .getStopsData();
+        List<StopHierarchy.StopInfoResponse.StopData> stops = getStops();
         GeographicalCoordinates requestCoordinates = new GeographicalCoordinates(lon, lat);
 
         List<StopHierarchy.StopInfoResponse.StopData> filteredStops = stops.stream().filter(stop -> {
@@ -47,5 +42,14 @@ public class StopConsumer {
             return requestCoordinates.distanceTo(stopCoordinates) <= 1000;
         }).collect(Collectors.toList());
         return filteredStops;
+    }
+
+    @GetMapping(value = "/search/getLines")
+    public List<StopHierarchy.StopInfoResponse.StopData> getLines(@RequestParam(name = "codParada") float codParada){
+        List<StopHierarchy.StopInfoResponse.StopData> stops = getStops();
+        return stops.stream()
+                .filter(stop -> stop.getCodParada()==codParada)
+                .collect(Collectors.toList());
+
     }
 }
