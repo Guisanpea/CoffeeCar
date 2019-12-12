@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/buses")
 public class BusConsumer {
     private final RestTemplate restTemplate;
+    private final String BUSES_URL = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=9bc05288-1c11-4eec-8792-d74b679c8fcf";
 
     public BusConsumer(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -23,16 +24,14 @@ public class BusConsumer {
 
     @GetMapping(value="")
     public List<BusHierarchy.BusInfoResponse.BusData> getBusesPosition(){
-        String uri = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=9bc05288-1c11-4eec-8792-d74b679c8fcf";
-
-        return Objects.requireNonNull(restTemplate.getForObject(uri, BusHierarchy.class)).getResult().getBusesData();
+        return Objects.requireNonNull(restTemplate.getForObject(BUSES_URL, BusHierarchy.class)).getResult().getBusesData();
     }
 
     @GetMapping(value="/search/findByLine")
     public List<BusHierarchy.BusInfoResponse.BusData> getBusesPosition(@RequestParam(name="line") float line){
         String uri = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=9bc05288-1c11-4eec-8792-d74b679c8fcf";
         List<BusHierarchy.BusInfoResponse.BusData> buses =
-                Objects.requireNonNull(restTemplate.getForObject(uri, BusHierarchy.class)).getResult().getBusesData();
+                Objects.requireNonNull(restTemplate.getForObject(BUSES_URL, BusHierarchy.class)).getResult().getBusesData();
 
         return buses.stream().filter(bus -> bus.getCodLinea()==line).collect(Collectors.toList());
     }

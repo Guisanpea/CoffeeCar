@@ -3,9 +3,6 @@ package es.uma.ingweb.coffeecar.controller;
 
 import es.uma.ingweb.coffeecar.entities.StopHierarchy;
 import es.uma.ingweb.coffeecar.entities.GeographicalCoordinates;
-import es.uma.ingweb.coffeecar.entities.User;
-import es.uma.ingweb.coffeecar.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,14 +18,14 @@ import java.util.stream.Collectors;
 public class StopConsumer {
 
     private final RestTemplate restTemplate;
-    private final String PARADAS_URL = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=d7eb3174-dcfb-4917-9876-c0e21dd810e3";
+    private final String STOPS_URL = "http://datosabiertos.malaga.eu/api/3/action/datastore_search?resource_id=d7eb3174-dcfb-4917-9876-c0e21dd810e3";
 
     public StopConsumer(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     private List<StopHierarchy.StopInfoResponse.StopData> getStops() {
-        return Objects.requireNonNull(restTemplate.getForObject(PARADAS_URL, StopHierarchy.class)).getResult().getStopsData();
+        return Objects.requireNonNull(restTemplate.getForObject(STOPS_URL, StopHierarchy.class)).getResult().getStopsData();
     }
 
     @GetMapping(value = "/search/findNearby")
@@ -45,11 +42,11 @@ public class StopConsumer {
     }
 
     @GetMapping(value = "/search/getLines")
-    public List<StopHierarchy.StopInfoResponse.StopData> getLines(@RequestParam(name = "codParada") float codParada){
+    public List<Float> getLines(@RequestParam(name = "codParada") float codParada){
         List<StopHierarchy.StopInfoResponse.StopData> stops = getStops();
         return stops.stream()
                 .filter(stop -> stop.getCodParada()==codParada)
-                .collect(Collectors.toList());
+                .map(StopHierarchy.StopInfoResponse.StopData::getCodLinea).collect(Collectors.toList());
 
     }
 }
